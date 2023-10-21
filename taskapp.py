@@ -1,4 +1,5 @@
 #import mysql.connector
+from distutils.command import clean
 import os
 import time
 
@@ -317,6 +318,7 @@ except ModuleNotFoundError:
     print("The 'mysql-connector' library is not installed.")
     print("Please install it using the following command:")
     print("pip install mysql-connector-python")
+    time.sleep(100)
 else:
     # The 'mysql-connector' library is installed -> Application is run
 
