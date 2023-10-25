@@ -2,56 +2,62 @@ import os
 import time
 
 def start():
-    userCred.append(input('Enter SQL UserName: '))
-    userCred.append(input('Enter SQL Passwd: '))
-    cnxInit=mysql.connector.connect(
-    host="localhost",
-    user=userCred[0],
-    password=userCred[1]
-    )
+    try:
+        userCred.append(input('Enter SQL UserName: '))
+        userCred.append(input('Enter SQL Passwd: '))
+        cnxInit=mysql.connector.connect(
+        host="localhost",
+        user=userCred[0],
+        password=userCred[1]
+        )
 
-    cursor = cnxInit.cursor()
+        cursor = cnxInit.cursor()
 
-    cursor.execute("SHOW DATABASES")
-    databases = [database[0] for database in cursor]
+        cursor.execute("SHOW DATABASES")
+        databases = [database[0] for database in cursor]
 
-    if "taskapp" not in databases:
-        # Create the "taskapp" database if it doesn't exist
-        cursor.execute("CREATE DATABASE taskapp")
-        print("Created database: taskapp")
+        if "taskapp" not in databases:
+            # Create the "taskapp" database if it doesn't exist
+            cursor.execute("CREATE DATABASE taskapp")
+            print("Created database: taskapp")
 
-    # Switch to the "taskapp" database
-    cursor.execute("USE taskapp")
+        # Switch to the "taskapp" database
+        cursor.execute("USE taskapp")
 
-    # Prompt for a username
-    userCred.append(input("Enter a username: ")+'todo')
+        # Prompt for a username
+        userCred.append(input("Enter a username: ")+'todo')
 
-    global utable
-    utable = userCred[2]
+        global utable
+        utable = userCred[2]
 
-    # Check if the user table exists
-    cursor.execute("SHOW TABLES")
-    tables = [table[0] for table in cursor]
+        # Check if the user table exists
+        cursor.execute("SHOW TABLES")
+        tables = [table[0] for table in cursor]
 
-    if utable not in tables:
-        # Create the user table if it doesn't exist
-        create_table_query= f"""
-        CREATE TABLE IF NOT EXISTS {utable}(
-            Taskid INT PRIMARY KEY AUTO_INCREMENT,
-            Name TEXT,
-            Description TEXT,
-            Status TEXT CHECK (Status IN ("Not Started", "In Progress", "Completed")),
-            Priority TEXT CHECK (Priority IN ('1', '2', '3'))
-        ) 
-        """
-        cursor.execute(create_table_query)
-        cnxInit.close()
-        print(f'Created table: {utable}')
-        mainScreen()
-        return
-    else:
-        mainScreen()
-        return
+        if utable not in tables:
+            # Create the user table if it doesn't exist
+            create_table_query= f"""
+            CREATE TABLE IF NOT EXISTS {utable}(
+                Taskid INT PRIMARY KEY AUTO_INCREMENT,
+                Name TEXT,
+                Description TEXT,
+                Status TEXT CHECK (Status IN ("Not Started", "In Progress", "Completed")),
+                Priority TEXT CHECK (Priority IN ('1', '2', '3'))
+            ) 
+            """
+            cursor.execute(create_table_query)
+            cnxInit.close()
+            print(f'Created table: {utable}')
+            mainScreen()
+            return
+        else:
+            mainScreen()
+            return
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+        print("Failed to connect to the MySQL server or authenticate. Please check your credentials.")
+        print('RESTART Program and Try Again.')
+        time.sleep(2)
     
 def getData(table_name):
     flushTable()
